@@ -1,25 +1,31 @@
 from flask import Flask, jsonify, make_response, request, jsonify
 from flask_mongoengine import MongoEngine
+import uuid
 
 app = Flask(__name__)
 
 db_name = 'videoInfo'
 db_URI = "mongodb+srv://admin:admin@cluster0.dcnym1g.mongodb.net/videoInfo?retryWrites=true&w=majority"
+
 app.config["MONGODB_HOST"] = db_URI
 
 db = MongoEngine()
 db.init_app(app)
 
 class Info(db.Document):
-    video_id = db.IntField()
-    video_title = db.StringField()
-    video_keyword = db.StringField()
+    unique_id = db.StringField()
+    title = db.StringField()
+    keyword = db.StringField()
+    URL = db.StringField()
+    category = db.StringField()
 
     def to_json(self):
         return {
-            "video_id" : self.video_id,
-            "video_title" : self.video_title,
-            "video_keyword" : self.video_keyword
+            "unique_id" : self.unique_id,
+            "category" : self.category,
+            "title" : self.title,
+            "keyword" : self.keyword,
+            "URL" : self.URL
         }
 
 @app.route('/')
@@ -29,10 +35,12 @@ def index():
 
 @app.route('/api/db_populate', methods=['POST'])
 def db_populate():
-    video1 = Info(video_id = 1, video_title = "REST API with pymongo", video_keyword = "pymongo")
-    video2 = Info(video_id = 2, video_title = "Access JSON file with python", video_keyword = "JSON")
+    video1 = Info(unique_id = ((uuid.uuid4()).hex),category = "Database", title = "REST API with pymongo", keyword = "pymongo", URL = "1234")
+    video2 = Info(unique_id = ((uuid.uuid4()).hex),category = "JSON", title = "Access JSON file with python", keyword = "JSON", URL = "5678")
+    video3 = Info(unique_id = ((uuid.uuid4()).hex),category = "Gaming", title = "valorant", keyword = "Gameplay", URL = "https://vimeo.com/726468840")
     video1.save()
     video2.save()
+    video3.save()
 
     return make_response("",201)
 
