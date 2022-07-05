@@ -52,16 +52,28 @@ def api_all_videos():
             videos.append(video)
         return make_response(jsonify(videos),200)
     elif request.method == "POST":
-        pass
+        content = request.json
+        video = Info(unique_id = content['unique_id'], category = content['category'], title = content['title'], keyword = content['keyword'], URL=content['URL'])
+        video.save()
+        return make_response("", 201)
 
-@app.route('/api/videos/<video_id>', methods=['GET', 'PUT', 'DELETE'])
-def api_each_video(video_id):
+@app.route('/api/videos/<unique_id>', methods=['GET', 'PUT', 'DELETE'])
+def api_each_video(unique_id):
     if request.method == "GET":
-        pass
+        video_obj = Info.objects(unique_id = unique_id).first()
+        if video_obj:
+            return make_response(jsonify(video_obj.to_json()),200)
+        else:
+            return make_response("", 404)
     elif request.method == "PUT":
-        pass
-    elif request.method == "DELET":
-        pass
+        content = request.json
+        video_obj = Info.objects(unique_id = unique_id).first()
+        video_obj.update(keyword = content['keyword'],category = content['category'])
+        return make_response("",204)
+    elif request.method == "DELETE":
+        video_obj = Info.objects(unique_id = unique_id).first()
+        video_obj.delete()
+        return make_response('')
 
 if __name__ == "__main__":
     app.run(debug=True)
