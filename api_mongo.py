@@ -75,5 +75,19 @@ def api_each_video(unique_id):
         video_obj.delete()
         return make_response('')
 
+
+@app.route('/api/videos/category/<category>', methods=['GET'])
+def api_each_category(category):
+    if request.method == "GET":
+        category_video = []
+        for video_obj in (Info.objects(category = category)):
+            category_video.append(video_obj)
+        if video_obj:
+            return make_response(jsonify(category_video),200)
+        else:
+            return make_response("", 404)
+
+
+
 if __name__ == "__main__":
     app.run(debug=True)
